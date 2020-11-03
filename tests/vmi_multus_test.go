@@ -938,11 +938,9 @@ var _ = Describe("[Serial]Macvtap", func() {
 	})
 
 	newCirrosVMIWithMacvtapNetwork := func(macvtapNetworkName string) *v1.VirtualMachineInstance {
-		macvtapMultusNetwork := libvmi.MultusNetwork(macvtapNetworkName)
-
 		return libvmi.NewCirros(
 			libvmi.WithInterface(*v1.DefaultMacvtapNetworkInterface(macvtapNetworkName)),
-			libvmi.WithNetwork(&macvtapMultusNetwork))
+			libvmi.WithNetwork(libvmi.MultusNetwork(macvtapNetworkName)))
 	}
 
 	createCirrosVMIWithMacvtapDefinedMAC := func(virtClient kubecli.KubevirtClient, networkName string, mac string) *v1.VirtualMachineInstance {

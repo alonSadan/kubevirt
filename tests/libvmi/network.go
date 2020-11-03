@@ -61,8 +61,8 @@ func InterfaceDeviceWithBridgeBinding() kvirtv1.Interface {
 }
 
 // MultusNetwork returns a Network with the given name
-func MultusNetwork(networkName string) kvirtv1.Network {
-	return kvirtv1.Network{
+func MultusNetwork(networkName string) *kvirtv1.Network {
+	return &kvirtv1.Network{
 		Name: networkName,
 		NetworkSource: kvirtv1.NetworkSource{
 			Multus: &kvirtv1.MultusNetwork{
