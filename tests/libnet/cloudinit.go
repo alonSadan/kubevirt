@@ -38,13 +38,19 @@ type CloudInitInterface struct {
 	Gateway6       string               `json:"gateway6,omitempty"`
 	Nameservers    CloudInitNameservers `json:"nameservers,omitempty"`
 	MACAddress     string               `json:"macaddress,omitempty"`
+	Match          CloudInitMatch       `json:"match,omitempty"`
 	MTU            int                  `json:"mtu,omitempty"`
 	Routes         []CloudInitRoute     `json:"routes,omitempty"`
+	SetName        string               `json:"set-name,omitempty"`
 }
 
 type CloudInitNameservers struct {
 	Search    []string `json:"search,omitempty,flow"`
 	Addresses []string `json:"addresses,omitempty,flow"`
+}
+
+type CloudInitMatch struct {
+	MACAddress string `json:"macaddress,omitempty"`
 }
 
 type CloudInitRoute struct {
@@ -94,6 +100,76 @@ func CreateDefaultCloudInitNetworkData() (string, error) {
 		return "", err
 	}
 
+	return string(networkData), nil
+}
+
+// CreateCloudInitNetworkDataWithIPv4AddressByMacAddress generates a configuration
+// for the Cloud-Init Network Data, in version 2 format.
+// It try to match a devices with the mac address and set a static IPv4 and IPv6 addresses,
+// inclusing DNS settings of the cluster nameserver IP and search domains.
+//
+// Example of using match on ethernet at cloud-init documentation [1]
+//
+// [1] https://cloudinit.readthedocs.io/en/latest/topics/network-config-format-v2.html#examples
+func CreateCloudInitNetworkDataWithIPv4AddressByMacAddress(macAddress, ipv4Address string) (string, error) {
+	dnsServerIP, err := ClusterDNSServiceIP()
+	if err != nil {
+		return "", err
+	}
+
+	networkData, err := CreateCloudInitNetworkData(
+		&CloudInitNetworkData{
+			Version: 2,
+			Ethernets: map[string]CloudInitInterface{
+				"id0": {
+					Match: CloudInitMatch{
+						MACAddress: macAddress,
+					},
+					SetName:   "id0", // Make NetworkManager happy
+					Addresses: []string{ipv6MasqueradeAddress, ipv4Address},
+					Gateway6:  ipv6MasqueradeGateway,
+					Nameservers: CloudInitNameservers{
+						Addresses: []string{dnsServerIP},
+						Search:    SearchDomains(),
+					},
+				},
+			},
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+	return string(networkData), nil
+}
+
+// CreateCloudInitNetworkDataWithIPv4AddressByDevice generates a configuration
+// for the Cloud-Init Network Data, in version 2 format.
+// It set a static IPv4 and IPv6 addresses to the specificed device name,
+// inclusing DNS settings of the cluster nameserver IP and search domains.
+func CreateCloudInitNetworkDataWithIPv4AddressByDevice(deviceName, ipv4Address string) (string, error) {
+	dnsServerIP, err := ClusterDNSServiceIP()
+	if err != nil {
+		return "", err
+	}
+
+	networkData, err := CreateCloudInitNetworkData(
+		&CloudInitNetworkData{
+			Version: 2,
+			Ethernets: map[string]CloudInitInterface{
+				deviceName: {
+					Addresses: []string{ipv6MasqueradeAddress, ipv4Address},
+					Gateway6:  ipv6MasqueradeGateway,
+					Nameservers: CloudInitNameservers{
+						Addresses: []string{dnsServerIP},
+						Search:    SearchDomains(),
+					},
+				},
+			},
+		},
+	)
+	if err != nil {
+		return "", err
+	}
 	return string(networkData), nil
 }
 
