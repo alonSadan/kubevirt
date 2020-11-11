@@ -71,6 +71,13 @@ func WithResourceMemory(value string) Option {
 	}
 }
 
+// WithNamespace specifies the vmi namespace
+func WithNamespace(value string) Option {
+	return func(vmi *kvirtv1.VirtualMachineInstance) {
+		vmi.Namespace = value
+	}
+}
+
 func baseVmi(name string) *kvirtv1.VirtualMachineInstance {
 	vmi := kvirtv1.NewVMIReferenceFromNameWithNS("", name)
 	vmi.Spec = kvirtv1.VirtualMachineInstanceSpec{Domain: kvirtv1.DomainSpec{}}

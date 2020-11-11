@@ -634,6 +634,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 			withSriovOptions := []libvmi.Option{
 				libvmi.WithContainerImage(cd.ContainerDiskFor(cd.ContainerDiskFedoraSRIOVLane)),
 				libvmi.WithCloudInitNoCloudNetworkData(cloudInitNetworkData, false),
+				libvmi.WithNamespace(tests.NamespaceTestDefault),
 			}
 			// sriov network interfaces
 			for _, name := range networks {
