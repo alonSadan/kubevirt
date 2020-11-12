@@ -394,8 +394,8 @@ var _ = Describe("[Serial]Multus", func() {
 					libvmi.WithCloudInitNoCloudNetworkData(cloudInitNetworkDataWithStaticIPsByMac(customMacAddress, "10.1.1.1/24"), false))
 				vmiOne = tests.StartVmOnNode(vmiOne, nodes.Items[0].Name)
 
-				tests.WaitUntilVMIReady(vmiTwo, console.LoggedInFedora)
-				tests.WaitUntilVMIReady(vmiOne, console.LoggedInFedora)
+				tests.WaitUntilVMIReady(vmiTwo, console.LoginToFedora)
+				tests.WaitUntilVMIReady(vmiOne, console.LoginToFedora)
 
 				By("Verifying the desired custom MAC is the one that were actually configured on the interface.")
 				ipLinkShow := fmt.Sprintf("ip link show id0 | grep -i \"%s\" | wc -l\n", customMacAddress)
@@ -664,7 +664,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 			vmi, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			tests.WaitUntilVMIReady(vmi, console.LoggedInFedora)
+			tests.WaitUntilVMIReady(vmi, console.LoginToFedora)
 			tests.WaitAgentConnected(virtClient, vmi)
 			return
 		}

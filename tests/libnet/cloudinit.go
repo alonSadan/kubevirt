@@ -126,8 +126,8 @@ func CreateCloudInitNetworkDataWithIPv4AddressByMacAddress(macAddress, ipv4Addre
 						MACAddress: macAddress,
 					},
 					SetName:   "id0", // Make NetworkManager happy
-					Addresses: []string{ipv6MasqueradeAddress, ipv4Address},
-					Gateway6:  ipv6MasqueradeGateway,
+					Addresses: []string{DefaultIPv6Address, ipv4Address},
+					Gateway6:  DefaultIPv6Gateway,
 					Nameservers: CloudInitNameservers{
 						Addresses: []string{dnsServerIP},
 						Search:    SearchDomains(),
@@ -157,8 +157,8 @@ func CreateCloudInitNetworkDataWithIPv4AddressByDevice(deviceName, ipv4Address s
 			Version: 2,
 			Ethernets: map[string]CloudInitInterface{
 				deviceName: {
-					Addresses: []string{ipv6MasqueradeAddress, ipv4Address},
-					Gateway6:  ipv6MasqueradeGateway,
+					Addresses: []string{DefaultIPv6Address, ipv4Address},
+					Gateway6:  DefaultIPv6Gateway,
 					Nameservers: CloudInitNameservers{
 						Addresses: []string{dnsServerIP},
 						Search:    SearchDomains(),
