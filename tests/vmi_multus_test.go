@@ -634,6 +634,8 @@ var _ = Describe("[Serial]SRIOV", func() {
 			withSriovOptions := []libvmi.Option{
 				libvmi.WithCloudInitNoCloudNetworkData(cloudInitNetworkData, false),
 				libvmi.WithNamespace(tests.NamespaceTestDefault),
+				libvmi.WithInterface(libvmi.InterfaceDeviceWithMasqueradeBinding()),
+				libvmi.WithNetwork(v1.DefaultPodNetwork()),
 			}
 			// sriov network interfaces
 			for _, name := range networks {
