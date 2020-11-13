@@ -632,7 +632,6 @@ var _ = Describe("[Serial]SRIOV", func() {
 		getSriovVmi := func(networks []string, cloudInitNetworkData string) *v1.VirtualMachineInstance {
 
 			withSriovOptions := []libvmi.Option{
-				libvmi.WithContainerImage(cd.ContainerDiskFor(cd.ContainerDiskFedoraSRIOVLane)),
 				libvmi.WithCloudInitNoCloudNetworkData(cloudInitNetworkData, false),
 				libvmi.WithNamespace(tests.NamespaceTestDefault),
 			}
@@ -648,7 +647,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 			}
 
 			// Pre-configured container-disk image for sriov-lane
-			vmi := libvmi.NewFedora(withSriovOptions...)
+			vmi := libvmi.NewSriovFedora(withSriovOptions...)
 
 			return vmi
 		}
