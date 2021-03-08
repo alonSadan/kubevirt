@@ -12,6 +12,9 @@ image_pull_policy=${IMAGE_PULL_POLICY:-IfNotPresent}
 verbosity=${VERBOSITY:-2}
 package_name=${PACKAGE_NAME:-kubevirt-dev}
 kubevirtci_git_hash="2102102051-a2b389f"
+conn_check_ipv4_address=8.8.8.8
+conn_check_ipv6_address=2001:db8:1::1
+conn_check_dns=google.com
 
 # try to derive csv_version from docker tag. But it must start with x.y.z, without leading v
 default_csv_version="${docker_tag/latest/0.0.0}"

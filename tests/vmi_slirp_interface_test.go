@@ -20,6 +20,7 @@
 package tests_test
 
 import (
+	"fmt"
 	"strings"
 
 	expect "github.com/google/goexpect"
@@ -36,6 +37,7 @@ import (
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
+	"kubevirt.io/kubevirt/tests/flags"
 	"kubevirt.io/kubevirt/tests/libvmi"
 )
 
@@ -140,13 +142,17 @@ var _ = Describe("[Serial]Slirp Networking", func() {
 		log.Log.Infof("%v", output)
 		Expect(err).To(HaveOccurred())
 
-		By("communicate with the outside world")
-		Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
-			&expect.BSnd{S: "\n"},
-			&expect.BExp{R: console.PromptExpression},
-			&expect.BSnd{S: "curl -o /dev/null -s -w \"%{http_code}\\n\" -k https://google.com\n"},
-			&expect.BExp{R: "301"},
-		}, 180)).To(Succeed())
+		if len(flags.ConnectivityCheckDNS) != 0 {
+			By("communicate with the outside world")
+			Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
+				&expect.BSnd{S: "\n"},
+				&expect.BExp{R: console.PromptExpression},
+				&expect.BSnd{S: fmt.Sprintf("curl -o /dev/null -s -w \"%%{http_code}\\n\" -k https://%s\n", flags.ConnectivityCheckDNS)},
+				&expect.BExp{R: "301"},
+			}, 180)).To(Succeed())
+		} else {
+			By("Skipping ping test. DNS was not provided")
+		}
 	},
 		table.Entry("VirtualMachineInstance with slirp interface", &genericVmi),
 		table.Entry("VirtualMachineInstance with slirp interface with custom MAC address", &deadbeafVmi),

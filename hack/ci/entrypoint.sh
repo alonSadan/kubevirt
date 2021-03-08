@@ -92,8 +92,12 @@ function run_tests() {
     mkdir -p "$ARTIFACT_DIR"
     # required to be set for test binary
     export ARTIFACTS=${ARTIFACT_DIR}
+    # addresses for testing external connection
+    export CONN_CHECK_IPV6_ADDRESS=2001:db8:1::1
+    export CONN_CHECK_IPV4_ADDRESS=8.8.8.8
+    export CONN_CHECK_DNS=google.com
 
-    tests.test -v=5 -kubeconfig=${KUBECONFIG} -container-tag=${DOCKER_TAG} -container-tag-alt= -container-prefix=${DOCKER_PREFIX} -image-prefix-alt=-kv -oc-path=${BIN_DIR}/oc -kubectl-path=${BIN_DIR}/kubectl -gocli-path=$(pwd)/cluster-up/cli.sh -test.timeout 420m -ginkgo.noColor -ginkgo.succinct -ginkgo.slowSpecThreshold=60 ${KUBEVIRT_TESTS_FOCUS} -junit-output=${ARTIFACT_DIR}/junit.functest.xml -installed-namespace=kubevirt -previous-release-tag= -previous-release-registry=quay.io/kubevirt -deploy-testing-infra=false
+    tests.test -v=5 -kubeconfig=${KUBECONFIG} -container-tag=${DOCKER_TAG} -container-tag-alt= -container-prefix=${DOCKER_PREFIX} -image-prefix-alt=-kv -oc-path=${BIN_DIR}/oc -kubectl-path=${BIN_DIR}/kubectl -gocli-path=$(pwd)/cluster-up/cli.sh -test.timeout 420m -ginkgo.noColor -ginkgo.succinct -ginkgo.slowSpecThreshold=60 ${KUBEVIRT_TESTS_FOCUS} -junit-output=${ARTIFACT_DIR}/junit.functest.xml -installed-namespace=kubevirt -previous-release-tag= -previous-release-registry=quay.io/kubevirt -deploy-testing-infra=false -conn-check-ipv4-address=${CONN_CHECK_IPV4_ADDRESS} -conn-check-ipv6-address=${CONN_CHECK_IPV6_ADDRESS} -conn-check-dns=${CONN_CHECK_DNS}
 }
 
 export PATH="$BIN_DIR:$PATH"

@@ -722,9 +722,18 @@ var _ = Describe("[Serial][rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][le
 				ipAddr := gatewayIPFromCIDR(networkCIDR)
 				Expect(libnet.PingFromVMConsole(serverVMI, ipAddr)).To(Succeed())
 
-				By("Checking ping (IPv4) to google")
-				Expect(libnet.PingFromVMConsole(serverVMI, "8.8.8.8")).To(Succeed())
-				Expect(libnet.PingFromVMConsole(clientVMI, "google.com")).To(Succeed())
+				By("Checking ping (IPv4)")
+				if len(flags.IPV4ConnectivityCheckAddress) != 0 {
+					Expect(libnet.PingFromVMConsole(serverVMI, flags.IPV4ConnectivityCheckAddress)).To(Succeed())
+				} else {
+					By("Skipping ping test. IPV4 address was not provided")
+				}
+
+				if len(flags.ConnectivityCheckDNS) != 0 {
+					Expect(libnet.PingFromVMConsole(clientVMI, flags.ConnectivityCheckDNS)).To(Succeed())
+				} else {
+					By("Skipping ping test. DNS was not provided")
+				}
 
 				Expect(verifyClientServerConnectivity(clientVMI, serverVMI, tcpPort, k8sv1.IPv4Protocol)).To(Succeed())
 			},
@@ -770,7 +779,11 @@ var _ = Describe("[Serial][rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][le
 				// Cluster nodes subnet (docker network gateway)
 				// Docker network subnet cidr definition:
 				// https://github.com/kubevirt/project-infra/blob/master/github/ci/shared-deployments/files/docker-daemon-mirror.conf#L5
-				Expect(libnet.PingFromVMConsole(serverVMI, "2001:db8:1::1")).To(Succeed())
+				if len(flags.IPV6ConnectivityCheckAddress) != 0 {
+					Expect(libnet.PingFromVMConsole(serverVMI, flags.IPV6ConnectivityCheckAddress)).To(Succeed())
+				} else {
+					By("Skipping ping test. IPV6 address was not provided")
+				}
 
 				Expect(verifyClientServerConnectivity(clientVMI, serverVMI, tcpPort, k8sv1.IPv6Protocol)).To(Succeed())
 			}, table.Entry("with a specific port number [IPv6]", []v1.Port{{Name: "http", Port: 8080}}),
